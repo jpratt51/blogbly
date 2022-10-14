@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 
 # Use test database and don't clutter tests with SQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///test_blogly'
@@ -24,13 +24,15 @@ class UserViewsTestCase(TestCase):
     def setUp(self):
         """Add sample user."""
 
+        Post.query.delete()
         User.query.delete()
 
         user = User(first_name='Alan', last_name='Alda', img_url='https://t3.ftcdn.net/jpg/02/94/62/14/360_F_294621430_9dwIpCeY1LqefWCcU23pP9i11BgzOS0N.jpg')
+
         db.session.add(user)
         db.session.commit()
 
-        self.user_id = user.id
+        self.users_id = user.id
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -49,7 +51,7 @@ class UserViewsTestCase(TestCase):
     def test_user_details_page(self):
         """Test correctly routing to user details page and displays user name"""
         with app.test_client() as client:
-            resp = client.get(f"/users/{self.user_id}")
+            resp = client.get(f"/users/{self.users_id}")
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
@@ -58,7 +60,7 @@ class UserViewsTestCase(TestCase):
     def test_edit_user_form(self):
         """Test correctly routing to user edit page and displays correct html"""
         with app.test_client() as client:
-            resp = client.get(f"/users/{self.user_id}/edit")
+            resp = client.get(f"/users/{self.users_id}/edit")
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
@@ -74,3 +76,21 @@ class UserViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Joel Burton", html)
+
+    def test_add_post_page(self):
+        with app.test_client() as client:
+            resp = client.get(f"/users/{self.users_id}/new-post")
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('Add Post for Alan Alda', html)
+
+    def test_post_details(self):
+        with app.test_client() as client:
+            d = {"title": "Famouse Quote", "content": "'Fortune favors the bold.' -Virgil"}
+
+            resp = client.post(f"/users/{self.users_id}/new-post", data=d, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('Famouse Quote', html)
