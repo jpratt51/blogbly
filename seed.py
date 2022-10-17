@@ -1,15 +1,16 @@
 """Seed file to make sample data for pets db."""
 
-from models import User, Post, db, connect_db
+from models import User, Post, Tag, PostTag, db
 from app import app
 
-# Create all tables
-db.drop_all()
-db.create_all()
-
 # If tables aren't empty, empty them
+PostTag.query.delete()
 User.query.delete()
+Tag.query.delete()
 Post.query.delete()
+
+# Create all tables
+db.create_all()
 
 # Add users
 Alan = User(first_name='Alan', last_name='Alda', img_url='https://t3.ftcdn.net/jpg/02/94/62/14/360_F_294621430_9dwIpCeY1LqefWCcU23pP9i11BgzOS0N.jpg')
@@ -20,12 +21,41 @@ Jane = User(first_name='Jane', last_name='Smith', img_url='https://www.iiba.org/
 post1 = Post(title="Famouse Quote", content="'Fortune favors the bold.' -Virgil", user_id=1)
 post2 = Post(title="Favorite Song This Week", content="'Ghost' by Justin Bieber", user_id=2)
 post3 = Post(title="Try This New Recipe", content="Creamy Vegan Pasta", user_id=3)
+post4 = Post(title="Easy Bean Casserole", content="Follow this link! www.brokenlink.com", user_id=1)
+post5 = Post(title="Inspirational Quote", content="'When you have a dream, you've got to grab it and never let go' -Carol Burnett", user_id=2)
+post6 = Post(title="New Song Release", content="'The Drummer' by Red Hot Chili Peppers", user_id=3)
+
+#Add Tags
+tag1 = Tag(name="#quote")
+tag2 = Tag(name="#song")
+tag3 = Tag(name="#recipe")
+tag4 = Tag(name="#new")
+
+#add tags to posts
+post1.tags.append(tag1)
+
+post2.tags.append(tag2)
+
+post3.tags.append(tag3)
+
+post3.tags.append(tag4)
+
+post4.tags.append(tag3)
+
+post5.tags.append(tag1)
+
+post6.tags.append(tag2)
+
+post6.tags.append(tag4)
 
 # Add new objects to session, so they'll persist
 db.session.add_all([Alan,Joel,Jane])
 
 db.session.commit()
 
-db.session.add_all([post1,post2,post3])
+db.session.add_all([post1,post2,post3,post4,post5,post6])
 
 db.session.commit()
+
+db.session.add_all([tag1, tag2, tag3, tag4])
+

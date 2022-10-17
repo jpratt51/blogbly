@@ -7,6 +7,13 @@
 </div>
 <div>
     By {{user.first_name}} {{user.last_name}}
+    <ul>
+        {% for tag in post.tags %}
+        <li>
+            {{tag.name}}
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 <form action="/users">
     <button>Cancel</button>
