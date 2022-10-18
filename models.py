@@ -37,6 +37,7 @@ class Post(db.Model):
         nullable=False,
         default=datetime.datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    tags = db.relationship('Tag', secondary='posts_tags', backref="post")
 
     @property
     def friendly_date(self):
@@ -62,12 +63,12 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
 
-    posts = db.relationship(
-        'Post',
-        secondary="posts_tags",
-        cascade="all, delete",
-        backref="tags",
-    )
+    # posts = db.relationship(
+    #     'Post',
+    #     secondary="posts_tags",
+    #     cascade="all, delete",
+    #     backref="tags",
+    # )
 
 
 def connect_db(app):

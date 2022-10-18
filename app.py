@@ -102,22 +102,25 @@ def add_post_page(user_id):
     """Display form to add new post"""
 
     user = User.query.get_or_404(user_id)
+    tags = Tag.query.all()
 
-    return render_template('new-post.html', user=user)
+    return render_template('new-post.html', user=user, tags=tags)
 
 @app.route('/users/<int:user_id>/new-post', methods=["POST"])
 def publish_post_page(user_id):
     """Add new post to db, then redirect to user details page."""
 
+    user = User.query.get_or_404(user_id)
+
     title = request.form["title"]
     content = request.form["content"]
+    tag_ids = [int(num) for num in request.form.getlist("tags")]
+    tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
     
-    edited_post = Post(title=title, content=content, user_id=user_id)
+    edited_post = Post(title=title, content=content, user_id=user_id, user=user, tags=tags)
 
     db.session.add(edited_post)
     db.session.commit()
-
-    user = User.query.get_or_404(user_id)
 
     return render_template("user-details.html",user=user)
 
@@ -127,7 +130,8 @@ def edit_post(user_id, post_id):
 
     user = User.query.get_or_404(user_id)
     post = Post.query.get_or_404(post_id)
-    return render_template("edit-post.html",user=user, post=post)
+    tags = Tag.query.all()
+    return render_template("edit-post.html",user=user, post=post, tags=tags)
 
 @app.route('/users/<int:user_id>/post/<int:post_id>/edit', methods=["POST"])
 def publish_edit(user_id, post_id):
@@ -137,8 +141,10 @@ def publish_edit(user_id, post_id):
     
     title = request.form["title"]
     content = request.form["content"]
+    tag_ids = [int(num) for num in request.form.getlist("tags")]
+    tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
     
-    edited_post = Post(title=title, content=content, user_id=user_id)
+    edited_post = Post(title=title, content=content, user_id=user_id, tags=tags)
 
     db.session.add(edited_post)
     db.session.commit()

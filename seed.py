@@ -4,12 +4,13 @@ from models import User, Post, Tag, PostTag, db
 from app import app
 
 # If tables aren't empty, empty them
-PostTag.query.delete()
-User.query.delete()
-Tag.query.delete()
-Post.query.delete()
+# PostTag.query.delete()
+# User.query.delete()
+# Tag.query.delete()
+# Post.query.delete()
 
 # Create all tables
+db.drop_all()
 db.create_all()
 
 # Add users
